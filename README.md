@@ -1,0 +1,2 @@
+# py-hasher
+Hashes strings
