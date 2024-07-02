@@ -166,10 +166,11 @@ class Sha256Hasher:
             h5 = self.add(h5, f)
             h6 = self.add(h6, g)
             h7 = self.add(h7, h)
+            print(h7)
         digest = ''
         for val in [h0, h1, h2, h3, h4, h5, h6, h7]:
             digest += self.bit_to_hex(val)
-            return digest
+        return digest
 
 def main():
     hasher = Sha256Hasher()
