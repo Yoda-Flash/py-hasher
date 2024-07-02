@@ -36,10 +36,10 @@ def main():
         key = has_key
     else:
         key = get_random_bytes(16)
-
+    print(type(key))
     print(f"Your key: {key}")
     if "e" in mode:
-        message = input("Please input the message you would like to encrypt. \n").strip().encode("utf-8")
+        message = input('Please input the message you would like to encrypt. \n').strip().encode("utf-8")
         cipher_text, tag, nonce = gcm.encrypt(header, key, message)
     elif "d" in mode:
         if nonce is None:
@@ -55,7 +55,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-# key: \xd1\xae\xa4\xc2=\x08\x9d\xdf\xc6\x19\x1c\x8dw\xef1\xfe
-# text: \x83A3\xff\xcb
-# tag: u\xae\x86\nP\x91\xe6^\x9dn\x97\xd3v\xe7\xe5\xa1
-# nonce:\xfd\xb3\xfd\xe5\xd9m\x08\xa4\nn\x14\x10\xcd\x04\x1f\x06
+# key:  b'!\xac\xd2\xd8Ms9@\x95\xc9Ud\x1c\x95[\xf9'
+# text: b'1\x83\xb2\xef\xd0'
+# tag: b'\x00\xb6?\x9c\xea\x9cx\x84KW\xa4\r\x19z\xf0C'
+# nonce: b'\xbd\x9b\xa40nTJ\xed\x87\x10e\xf7R\x0f\xb5&'
