@@ -1,61 +1,69 @@
-from Crypto.Cipher import AES
+import base64
+import hashlib
+
+from Crypto.Cipher import AES  # from pycryptodomex v-3.10.4
 from Crypto.Random import get_random_bytes
 
-class GCM:
+HASH_NAME = "SHA512"
+IV_LENGTH = 12
+ITERATION_COUNT = 65535
+KEY_LENGTH = 32
+SALT_LENGTH = 16
+TAG_LENGTH = 16
 
-    def encrypt(self, header, key, data):
-        cipher = AES.new(key, AES.MODE_GCM)
-        cipher.update(header)
 
-        cipher_text, tag = cipher.encrypt_and_digest(data)
-        nonce = cipher.nonce
-        print(f"Cipher text: {cipher_text}")
-        print(f"Cipher tag: {tag}")
-        print(f"Cipher nonce: {nonce}")
+def encrypt(password, plain_message):
+    salt = get_random_bytes(SALT_LENGTH)
+    iv = get_random_bytes(IV_LENGTH)
 
-        return cipher_text, tag, nonce
+    secret = get_secret_key(password, salt)
 
-    def decrypt(self, header, key, nonce, cipher_text, tag):
-        cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
-        cipher.update(header)
+    cipher = AES.new(secret, AES.MODE_GCM, iv)
 
-        plain_text = cipher.decrypt_and_verify(cipher_text, tag).decode("utf-8")
-        print(f"Your text: {plain_text}")
-        return plain_text
+    encrypted_message_byte, tag = cipher.encrypt_and_digest(
+        plain_message.encode("utf-8")
+    )
+    cipher_byte = salt + iv + encrypted_message_byte + tag
 
-def main():
-    gcm = GCM()
-    header = b"header"
-    mode = input("Do you wish to encrypt or decrypt? If encrypt, type 'e', if decrypt, type 'd' \n").lower()
-    has_key = input("Do you have a key? If so, please input it. If not, please hit enter. \n")
-    nonce = None
-    cipher_text = None
-    tag = None
+    encoded_cipher_byte = base64.b64encode(cipher_byte)
+    return bytes.decode(encoded_cipher_byte)
 
-    if has_key != "":
-        key = has_key
-    else:
-        key = get_random_bytes(16)
-    print(type(key))
-    print(f"Your key: {key}")
-    if "e" in mode:
-        message = input('Please input the message you would like to encrypt. \n').strip().encode("utf-8")
-        cipher_text, tag, nonce = gcm.encrypt(header, key, message)
-    elif "d" in mode:
-        if nonce is None:
-            nonce = input("Please input the nonce. \n").strip()
-            nonce = bytes(nonce, "utf-8")
-        if cipher_text is None:
-            cipher_text = input("Please input the encrypted text. \n").strip()
-        if tag is None:
-            tag = input("Please input the tag. \n").strip()
 
-        gcm.decrypt(header, key, nonce, cipher_text, tag)
+def decrypt(password, cipher_message):
+    decoded_cipher_byte = base64.b64decode(cipher_message)
 
-if __name__ == "__main__":
-    main()
+    salt = decoded_cipher_byte[:SALT_LENGTH]
+    iv = decoded_cipher_byte[SALT_LENGTH : (SALT_LENGTH + IV_LENGTH)]
+    encrypted_message_byte = decoded_cipher_byte[
+        (IV_LENGTH + SALT_LENGTH) : -TAG_LENGTH
+    ]
+    tag = decoded_cipher_byte[-TAG_LENGTH:]
+    secret = get_secret_key(password, salt)
+    cipher = AES.new(secret, AES.MODE_GCM, iv)
 
-# key:  b'!\xac\xd2\xd8Ms9@\x95\xc9Ud\x1c\x95[\xf9'
-# text: b'1\x83\xb2\xef\xd0'
-# tag: b'\x00\xb6?\x9c\xea\x9cx\x84KW\xa4\r\x19z\xf0C'
-# nonce: b'\xbd\x9b\xa40nTJ\xed\x87\x10e\xf7R\x0f\xb5&'
+    decrypted_message_byte = cipher.decrypt_and_verify(encrypted_message_byte, tag)
+    return decrypted_message_byte.decode("utf-8")
+
+
+def get_secret_key(password, salt):
+    return hashlib.pbkdf2_hmac(
+        HASH_NAME, password.encode(), salt, ITERATION_COUNT, KEY_LENGTH
+    )
+
+
+outputFormat = "{:<25}:{}"
+# secret_key = "your_secure_key"
+# plain_text = "Your_plain_text"
+secret_key = input("Secret key: \n")
+plain_text = input("Plain text: \n")
+
+print("------ AES-GCM Encryption ------")
+cipher_text = encrypt(secret_key, plain_text)
+print(outputFormat.format("encryption input", plain_text))
+print(outputFormat.format("encryption output", cipher_text))
+
+decrypted_text = decrypt(secret_key, cipher_text)
+
+print("\n------ AES-GCM Decryption ------")
+print(outputFormat.format("decryption input", cipher_text))
+print(outputFormat.format("decryption output", decrypted_text))
