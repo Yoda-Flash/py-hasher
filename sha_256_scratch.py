@@ -1,4 +1,4 @@
-class Sha256Hasher():
+class SHA_256_Hasher():
     def __init__(self):
         pass
 
@@ -175,7 +175,7 @@ class Sha256Hasher():
         return digest
 
 def main():
-    hasher = Sha256Hasher()
+    hasher = SHA_256_Hasher()
     message = hasher.get_plain_message()
     print(hasher.sha256(message))
 

@@ -1,9 +1,14 @@
 import tkinter as tk
 from tkinter import Entry, Label
 from tkinter import ttk
-# from sha-256-scratch import Sha256Hasher
+
+from aes_gcm import AES_GCM
+from sha_256_scratch import SHA_256_Hasher
 
 root = tk.Tk()
+aes = AES_GCM()
+sha = SHA_256_Hasher()
+
 
 root.title('SHA-256 Hasher')
 combobox = ttk.Combobox(root, values=['SHA-256', 'AES-GCM'])
@@ -12,7 +17,7 @@ hash_message = message = Entry(root)
 transfer_label = Label(root, text='Message to transfer:')
 transfer_message = Entry(root)
 secret_label = Label(root, text='Secret:')
-secret_message = Entry(root)
+secret_key = Entry(root)
 combobox.pack(pady=20)
 combobox.set('SHA-256')
 mode = combobox.get()
@@ -26,16 +31,24 @@ def on_select(event):
         transfer_label.pack_forget()
         transfer_message.pack_forget()
         secret_label.pack_forget()
-        secret_message.pack_forget()
+        secret_key.pack_forget()
         hash_label.pack()
         hash_message.pack()
+        if hash_message is not None:
+            hashed_message = sha.sha256(str(hash_message))
+            Label(root, text=f'Your hashed message is: {hashed_message}').pack()
     elif mode == 'AES-GCM':
         hash_label.pack_forget()
         hash_message.pack_forget()
         transfer_label.pack()
         transfer_message.pack()
         secret_label.pack()
-        secret_message.pack()
+        secret_key.pack()
+        if transfer_message is not None:
+            encrypted_message = aes.encrypt(str(secret_key), str(transfer_message))
+            Label(root, text=f'Your encrypted message is: {encrypted_message}').pack()
+            decrypted_message = aes.decrypt(str(secret_key), encrypted_message)
+            Label(root, text=f'Your decrypted message is: {decrypted_message}').pack()
 
 combobox.bind('<<ComboboxSelected>>', on_select)
 
