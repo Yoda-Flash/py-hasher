@@ -1,4 +1,7 @@
-class Sha256Hasher:
+class Sha256Hasher():
+    def __init__(self):
+        pass
+
     def get_plain_message(self) -> str:
         message = input("Please enter the message you wish to hash: \n")
         return message
