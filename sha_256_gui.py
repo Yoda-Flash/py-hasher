@@ -25,7 +25,6 @@ mode = combobox.get()
 hash_label.pack()
 hash_message.pack()
 
-
 def on_select(event):
     mode = combobox.get()
     if mode == 'SHA-256':
@@ -48,9 +47,6 @@ def on_enter():
     hashed_label = Label(root, text='Your hashed message is:')
     encrypted_label = Label(root, text='Your encrypted message is:')
     decrypted_label = Label(root, text=f'Your decrypted message is:')
-    hashed_label.pack_forget()
-    encrypted_label.pack_forget()
-    decrypted_label.pack_forget()
     if mode == 'SHA-256':
         hashed_message = sha.sha256(str(hash_message.get()))
         hashed_label.config(text=f'Your hashed message is: {hashed_message}')
