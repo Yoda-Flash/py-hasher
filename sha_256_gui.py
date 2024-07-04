@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Entry, Label
+from tkinter import Entry, Label, Button
 from tkinter import ttk
 
 from aes_gcm import AES_GCM
@@ -13,13 +13,14 @@ sha = SHA_256_Hasher()
 root.title('SHA-256 Hasher')
 combobox = ttk.Combobox(root, values=['SHA-256', 'AES-GCM'])
 hash_label = Label(root, text='Message to hash:')
-hash_message = message = Entry(root)
+hash_message = Entry(root)
 transfer_label = Label(root, text='Message to transfer:')
 transfer_message = Entry(root)
 secret_label = Label(root, text='Secret:')
 secret_key = Entry(root)
 combobox.pack(pady=20)
 combobox.set('SHA-256')
+
 mode = combobox.get()
 hash_label.pack()
 hash_message.pack()
@@ -34,9 +35,7 @@ def on_select(event):
         secret_key.pack_forget()
         hash_label.pack()
         hash_message.pack()
-        if hash_message is not None:
-            hashed_message = sha.sha256(str(hash_message))
-            Label(root, text=f'Your hashed message is: {hashed_message}').pack()
+
     elif mode == 'AES-GCM':
         hash_label.pack_forget()
         hash_message.pack_forget()
@@ -44,12 +43,28 @@ def on_select(event):
         transfer_message.pack()
         secret_label.pack()
         secret_key.pack()
-        if transfer_message is not None:
-            encrypted_message = aes.encrypt(str(secret_key), str(transfer_message))
-            Label(root, text=f'Your encrypted message is: {encrypted_message}').pack()
-            decrypted_message = aes.decrypt(str(secret_key), encrypted_message)
-            Label(root, text=f'Your decrypted message is: {decrypted_message}').pack()
 
+def on_enter():
+    hashed_label = Label(root, text='Your hashed message is:')
+    encrypted_label = Label(root, text='Your encrypted message is:')
+    decrypted_label = Label(root, text=f'Your decrypted message is:')
+    hashed_label.pack_forget()
+    encrypted_label.pack_forget()
+    decrypted_label.pack_forget()
+    if mode == 'SHA-256':
+        hashed_message = sha.sha256(str(hash_message.get()))
+        hashed_label.config(text=f'Your hashed message is: {hashed_message}')
+        hashed_label.pack()
+    elif mode == 'AES-GCM':
+        encrypted_message = aes.encrypt(str(secret_key.get()), str(transfer_message.get()))
+        encrypted_label.config(text=f'Your encrypted message is: {encrypted_message}')
+        encrypted_label.pack()
+        decrypted_message = aes.decrypt(str(secret_key.get()), encrypted_message)
+        decrypted_label.config(text=f'Your decrypted message is: {decrypted_message}')
+        decrypted_label.pack()
+
+enter_button = Button(root, text='Enter!', command=on_enter)
+enter_button.pack()
 combobox.bind('<<ComboboxSelected>>', on_select)
 
 root.mainloop()
