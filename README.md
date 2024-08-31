@@ -8,3 +8,5 @@ The AES-GCM file is a demo of the AES cipher, where you can input your own key a
 Follow the program instructions to run, and enjoy!
 
 If you wish to use a GUI, run the gui.py program and enter all the necessary fields!
+
+![image](https://github.com/user-attachments/assets/b1b7b7b6-e2d0-4507-acb3-2c86a790551e)
