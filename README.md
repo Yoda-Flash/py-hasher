@@ -6,3 +6,5 @@ Both sha-256 files are for running the SHA-256 algorithm to hash messages based 
 The AES-GCM file is a demo of the AES cipher, where you can input your own key and message and view it be encrypted and then decrypted. 
 
 Follow the program instructions to run, and enjoy!
+
+If you wish to use a GUI, run the gui.py program and enter all the necessary fields!
